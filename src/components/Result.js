@@ -1,59 +1,40 @@
 import Navbar from "./Navbar";
-import axios from "axios";
 import { useEffect, useState } from "react";
+import API from "../api/api";
 
 function Result() {
   const [results, setResults] = useState([]);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/result/1", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => setResults(res.data));
+    API.get("/api/result/1")
+      .then((res) => setResults(res.data))
+      .catch(() => alert("Error fetching results"));
   }, []);
 
   return (
     <>
       <Navbar />
-
       <div className="page-container">
-        <h2 style={{ textAlign: "center", marginBottom: "25px" }}>
-          🗳 Election Results
-        </h2>
+        <h2>Election Results</h2>
 
-        <div className="result-card">
-          <table className="result-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Candidate Name</th>
-                <th>Total Votes</th>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Candidate</th>
+              <th>Votes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {results.map((r, i) => (
+              <tr key={i}>
+                <td>{i + 1}</td>
+                <td>{r.candidate}</td>
+                <td>{r.votes}</td>
               </tr>
-            </thead>
-            <tbody>
-              {results.length > 0 ? (
-                results.map((r, index) => (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{r.candidate}</td>
-                    <td>
-                      <span className="vote-badge">{r.votes}</span>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3" style={{ textAlign: "center" }}>
-                    No Results Found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </>
   );

@@ -1,25 +1,28 @@
 import Navbar from "./Navbar";
 import { useState } from "react";
-import axios from "axios";
+import API from "../api/api";
 
 function AddElection() {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
 
   const submit = async () => {
-    await axios.post(
-      "http://localhost:8080/api/admin/election",
-      { title, description: desc, active: true },
-      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-    );
+    try {
+      await API.post("/api/admin/election", {
+        title,
+        description: desc,
+        active: true,
+      });
 
-    alert("Election Added Successfully");
+      alert("Election Added Successfully");
+    } catch {
+      alert("Error adding election");
+    }
   };
 
   return (
     <div className="page-wrapper">
       <Navbar />
-
       <div className="page-card">
         <h3>Add Election</h3>
 

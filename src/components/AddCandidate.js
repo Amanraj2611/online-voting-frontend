@@ -1,6 +1,6 @@
 import Navbar from "./Navbar";
-import axios from "axios";
 import { useEffect, useState } from "react";
+import API from "../api/api";
 
 function AddCandidate() {
   const [name, setName] = useState("");
@@ -8,27 +8,25 @@ function AddCandidate() {
   const [electionId, setElectionId] = useState("");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/election", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      })
-      .then((res) => setElections(res.data));
+    API.get("/api/election").then((res) => setElections(res.data));
   }, []);
 
   const submit = async () => {
-    await axios.post(
-      "http://localhost:8080/api/admin/candidate",
-      { name, election: { id: electionId } },
-      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-    );
+    try {
+      await API.post("/api/admin/candidate", {
+        name,
+        election: { id: electionId },
+      });
 
-    alert("Candidate Added Successfully");
+      alert("Candidate Added Successfully");
+    } catch {
+      alert("Error adding candidate");
+    }
   };
 
   return (
     <div className="page-wrapper">
       <Navbar />
-
       <div className="page-card">
         <h3>Add Candidate</h3>
 
