@@ -2,24 +2,53 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const BASE_URL = "https://online-voting-system-backend-5ytb.onrender.com";
+
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
+    if (!email || !password) {
+      alert("Please enter email and password");
+      return;
+    }
+
     try {
-      const res = await axios.post(
-        "https://online-voting-system-backend-5ytb.onrender.com/api/auth/login",
-        { email, password }
+      setLoading(true);
+
+      const response = await axios.post(
+        `${BASE_URL}/api/auth/login`,
+        {
+          email,
+          password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
 
-      localStorage.setItem("token", res.data.token);
+      // Save token
+      localStorage.setItem("token", response.data.token);
+
+      // Redirect
       navigate("/dashboard");
-    } catch (err) {
-      alert("Invalid email or password");
+    } catch (error) {
+      console.error("Login Error:", error);
+
+      if (error.response) {
+        alert(error.response.data.message || "Invalid credentials");
+      } else {
+        alert("Server not responding. Try again later.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -33,18 +62,22 @@ function Login() {
           <input
             type="email"
             placeholder="Enter Email"
-            required
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
 
           <input
             type="password"
             placeholder="Enter Password"
-            required
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
 
-          <button type="submit">Login</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
         </form>
       </div>
     </div>

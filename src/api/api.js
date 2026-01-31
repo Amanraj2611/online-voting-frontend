@@ -4,13 +4,12 @@ const API = axios.create({
   baseURL: "https://online-voting-system-backend-5ytb.onrender.com",
 });
 
-// Automatically attach token
-API.interceptors.request.use((req) => {
+API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `Bearer ${token}`;
   }
-  return req;
+  return config;
 });
 
 export default API;
